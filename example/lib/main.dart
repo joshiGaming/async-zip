@@ -157,7 +157,7 @@ class _MyAppState extends State<MyApp> {
     final archiveFile = File(path.join(tempDir.path, 'archive.zip'));
     await archiveFile.writeAsBytes(archiveData.buffer.asUint8List());
     final extractTo = Directory(path.join(tempDir.path, 'zip-content'));
-
+    
     var copied = 0;
     var percentage = 0;
 

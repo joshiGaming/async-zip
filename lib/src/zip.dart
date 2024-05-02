@@ -2,6 +2,8 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:ffi/ffi.dart';
+import 'package:flutter/foundation.dart';
+import 'package:path/path.dart';
 
 const ModeRead = 0x72;
 const ModeWrite = 0x77;
@@ -9,7 +11,8 @@ const ModeAppend = 0x61;
 
 final DynamicLibrary zipLib = Platform.isAndroid
     ? DynamicLibrary.open("libasync_zip.so")
-    : DynamicLibrary.process();
+    : Platform.isWindows ? DynamicLibrary.open(join(Directory.current.path,'bin', 'zip', 'zip.dll')) :DynamicLibrary.process();
+
 
 typedef ZipHandle = Pointer<Void>;
 typedef CharPointer = Pointer<Utf8>;

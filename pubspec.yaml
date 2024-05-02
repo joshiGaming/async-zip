@@ -18,6 +18,8 @@ dev_dependencies:
     sdk: flutter
 
 flutter:
+  assets:
+    - windows/prebuilt/zip.dll
   plugin:
     platforms:
       android:

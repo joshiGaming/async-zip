@@ -15,7 +15,9 @@ import 'zip.dart';
 ///
 /// if the optional [callback] is specified, it will be called for every
 /// extracted file after the extraction has been completed.
-void extractZipArchiveSync(File archive, Directory dir, {void Function(ZipEntry entry, int totalEntries)? callback}) {
+void extractZipArchiveSync(File archive, Directory dir, {void Function(ZipEntry entry, int totalEntries)? callback, List<String>? exclude }) {
+    exclude = exclude ?? [];
+    
   if (callback == null) {
     final archivePath = archive.path.toNativeUtf8();
     final dirPath = dir.path.toNativeUtf8();
@@ -31,7 +33,15 @@ void extractZipArchiveSync(File archive, Directory dir, {void Function(ZipEntry 
   final reader = ZipFileReaderSync();
   reader.open(archive);
   final entries = reader.entries();
+
+  entryloop:
   for (final entry in entries) {
+      for (var exlcudeName in exclude) {
+        if(entry.name.startsWith(exlcudeName)) {
+          continue entryloop;
+        }
+      }
+
     if (entry.isDir) {
       Directory(path.join(dir.path, entry.name)).createSync(recursive: true);
     } else {

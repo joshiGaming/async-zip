@@ -1,17 +1,40 @@
 import 'dart:ffi';
 import 'dart:io';
-
+import 'package:path_provider/path_provider.dart';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 
 const ModeRead = 0x72;
 const ModeWrite = 0x77;
 const ModeAppend = 0x61;
 
-final DynamicLibrary zipLib = Platform.isAndroid
+
+Future<File> _getImageFileFromAssets(String path) async {
+    Directory tempDir = await getTemporaryDirectory();
+    String tempPath = tempDir.path;
+    var filePath = "$tempPath/$path";
+    var file = File(filePath);
+    if (file.existsSync()) {
+      return file;
+    } else {
+      final byteData = await rootBundle.load('$path');
+      final buffer = byteData.buffer;
+      file.createSync(recursive: true);
+      return file
+          .writeAsBytes(buffer.asUint8List(byteData.offsetInBytes,
+          byteData.lengthInBytes));
+    }
+  }
+
+  initzialize() async{
+    zipLib = Platform.isAndroid
     ? DynamicLibrary.open("libasync_zip.so")
-    : Platform.isWindows ? DynamicLibrary.open(join(Directory.current.path,'bin', 'zip', 'zip.dll')) :DynamicLibrary.process();
+    : Platform.isWindows ? DynamicLibrary.open((await _getImageFileFromAssets("windows/prebuilt/zip.dll")).path) :DynamicLibrary.process();
+  }
+
+late final DynamicLibrary zipLib;
 
 
 typedef ZipHandle = Pointer<Void>;

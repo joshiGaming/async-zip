@@ -61,7 +61,7 @@ void extractZipArchiveSync(File archive, Directory dir, {void Function(ZipEntry 
 /// extracted file after the extraction has been completed.
 Future<void> extractZipArchive(File archive, Directory dir,
     {void Function(ZipEntry entry, int totalEntries)? callback}) async {
-   await initzialize();   
+  
   final receivePort = ReceivePort();
   final sendPort = receivePort.sendPort;
   Isolate.spawn((args) {
@@ -81,9 +81,7 @@ Future<void> extractZipArchive(File archive, Directory dir,
   }
 }
 
-Future<void> initzializeManually() async{
- await initzialize();
-}
+
 
 /// Reads data from a Zip archive.
 class ZipFileReaderSync {

@@ -10,30 +10,38 @@ const ModeWrite = 0x77;
 const ModeAppend = 0x61;
 
 
-Future<File> _getImageFileFromAssets(String path) async {
-    Directory tempDir = await Directory.systemTemp;
-    String tempPath = tempDir.path;
-    var filePath = "$tempPath/$path";
-    var file = File(filePath);
-    if (file.existsSync()) {
-      return file;
-    } else {
-      final byteData = await rootBundle.load('$path');
-      final buffer = byteData.buffer;
-      file.createSync(recursive: true);
-      return file
-          .writeAsBytes(buffer.asUint8List(byteData.offsetInBytes,
-          byteData.lengthInBytes));
-    }
+DynamicLibrary _getFFIFileWindows() {
+ 
+  final String _assetsPackageDir = normalize(
+      join('data', 'flutter_assets', 'packages', 'async_zip', 'prebuilt' ));
+  final String _exeDirPath = File(Platform.resolvedExecutable).parent.path;
+
+
+     String  _packageAssetsDirPath =
+      normalize(join(_exeDirPath, _assetsPackageDir));
+  
+// LOAD DLL
+  try {
+    String _printerLibraryPath =
+        normalize(join(_packageAssetsDirPath, 'zip.dll'));
+
+    DynamicLibrary _library = DynamicLibrary.open(_printerLibraryPath);
+    return _library;
+  } catch (e) {
+      print(e);
+      DynamicLibrary _library = DynamicLibrary.open('zip.dll');
+      return _library;
+
+  }
   }
 
-  initzialize() async{
-    zipLib = Platform.isAndroid
+ 
+final DynamicLibrary zipLib = Platform.isAndroid
     ? DynamicLibrary.open("libasync_zip.so")
-    : Platform.isWindows ? DynamicLibrary.open((await _getImageFileFromAssets("windows/prebuilt/zip.dll")).path) :DynamicLibrary.process();
-  }
+    : Platform.isWindows ? _getFFIFileWindows() :DynamicLibrary.process();
+  
 
-late final DynamicLibrary zipLib;
+
 
 
 typedef ZipHandle = Pointer<Void>;

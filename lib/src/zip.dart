@@ -1,6 +1,5 @@
 import 'dart:ffi';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +11,7 @@ const ModeAppend = 0x61;
 
 
 Future<File> _getImageFileFromAssets(String path) async {
-    Directory tempDir = await getTemporaryDirectory();
+    Directory tempDir = await Directory.systemTemp;
     String tempPath = tempDir.path;
     var filePath = "$tempPath/$path";
     var file = File(filePath);
